@@ -1,16 +1,27 @@
-import { data } from './data.js';
-let field = document.querySelector('#app-search');
-let spacecrafts = data.map((craft) => craft.spacecraft);
-let list = document.querySelector('#results-list');
-spacecrafts.forEach((space) => {
-  list.insertAdjacentHTML('beforeend', `<li>${space}</li>`);
+import {data} from "./data.js";
+
+const results = document.querySelector("#results-list");
+const search = document.querySelector("#app-search");
+
+const render = (query = "") => {
+    const cleanedupQuery = query.trim().toLowerCase();
+    const filtered = data.filter(item => item.spacecraft.toLowerCase().includes(cleanedupQuery));
+
+    results.innerHTML = "";
+    filtered.forEach(item => {
+        results.insertAdjacentHTML("beforeend", `<li>${item.spacecraft}</li>`)
+    });
+}
+
+// render as the user types
+search.addEventListener("keyup", () => {
+    render(search.value);
 });
-field.addEventListener('keyup', (event) => {
-  let filtered = spacecrafts.filter((space) => {
-    return space.toLowerCase().includes(field.value.trim().toLowerCase());
-  });
-  list.textContent = '';
-  filtered.forEach((space) => {
-    list.insertAdjacentHTML('beforeend', `<li>${space}</li>`);
-  });
-});
+
+// render on page load
+render();
+
+// Note on the performance of this approach. If you had a list that contained a lot more data, and/or you had more complicated data being rendered inside the <li> (for example, images), then this approach would be slow. That's because, for every render, we're clearing the `innerHTML` and then inserting every spacecraft again into the DOM.
+// This is one of the main reasons why developers resort to a front-end library/framework (Lit, React, Vue, Angular, Ember, etc.)
+
+// If you'd like an efficient approach in JavaScript, then you can render all of the spacecraft once, and then hide/show the ones that match the correct result.
